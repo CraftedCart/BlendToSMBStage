@@ -66,7 +66,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = i / bpy.context.scene.render.fps
 
-        val = bpy.context.scene.objects.active.location.z - initVal
+        val = -bpy.context.scene.objects.active.location.z - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -126,7 +126,7 @@ def addRotZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = i / bpy.context.scene.render.fps
 
-        val = (bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF;
+        val = (-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF;
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -172,11 +172,11 @@ class CopyAnimXML(bpy.types.Operator):
             kf.append(posX)
         if context.scene.genPosYKeyframesProp:
             posY = etree.Element("posY")
-            addPosXAnim(posY)
+            addPosZAnim(posY)
             kf.append(posY)
         if context.scene.genPosZKeyframesProp:
             posZ = etree.Element("posZ")
-            addPosXAnim(posZ)
+            addPosYAnim(posZ)
             kf.append(posZ)
         if context.scene.genRotXKeyframesProp:
             rotX = etree.Element("rotX")
@@ -184,11 +184,11 @@ class CopyAnimXML(bpy.types.Operator):
             kf.append(rotX)
         if context.scene.genRotYKeyframesProp:
             rotY = etree.Element("rotY")
-            addRotXAnim(rotY)
+            addRotZAnim(rotY)
             kf.append(rotY)
         if context.scene.genRotZKeyframesProp:
             rotZ = etree.Element("rotZ")
-            addRotXAnim(rotZ)
+            addRotYAnim(rotZ)
             kf.append(rotZ)
 
         #Copy the XML to the clipboard

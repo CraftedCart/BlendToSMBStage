@@ -1,5 +1,6 @@
 import bpy
-from lxml import etree
+# from lxml import etree
+import xml.etree.ElementTree as etree
 import math
 
 bl_info = {
@@ -86,7 +87,7 @@ def addRotXAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
+        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -106,7 +107,7 @@ def addRotYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
+        val = round((bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -126,7 +127,7 @@ def addRotZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
+        val = round((-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -228,6 +229,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.prop(scene, "roundTimeProp")
         layout.prop(scene, "roundValueProp")
+        layout.label("Rotations are always rounded to the nearest int")
 
         layout.operator(CopyAnimXML.bl_idname)
 
@@ -235,7 +237,7 @@ def register():
     bpy.utils.register_module(__name__)
 
     bpy.types.Scene.roundTimeProp = bpy.props.IntProperty(name = "Time decimal places", default = 3)
-    bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Value (Pos/Rot) decimal places", default = 3)
+    bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Position decimal places", default = 3)
 
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)
     bpy.types.Scene.genPosYKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Y keyframes", default = True)

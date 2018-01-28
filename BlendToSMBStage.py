@@ -23,7 +23,7 @@ def addPosXAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.location.x
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -43,7 +43,7 @@ def addPosYAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.location.y
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -63,7 +63,7 @@ def addPosZAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.location.z
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -83,7 +83,7 @@ def addRotXAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.rotation_euler.x
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -103,7 +103,7 @@ def addRotYAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.rotation_euler.y
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -123,7 +123,7 @@ def addRotZAnim(parent):
     bpy.context.scene.frame_set(0)
     initVal = bpy.context.scene.objects.active.rotation_euler.z
 
-    for i in range(startFrame, endFrame):
+    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
@@ -227,6 +227,9 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.prop(scene, "genRotYKeyframesProp")
         layout.prop(scene, "genRotZKeyframesProp")
 
+        layout.label("Lower timestep = more keyframes")
+        layout.prop(scene, "timeStepProp")
+
         layout.prop(scene, "roundTimeProp")
         layout.prop(scene, "roundValueProp")
         layout.label("Rotations are always rounded to the nearest int")
@@ -238,6 +241,7 @@ def register():
 
     bpy.types.Scene.roundTimeProp = bpy.props.IntProperty(name = "Time decimal places", default = 3)
     bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Position decimal places", default = 3)
+    bpy.types.Scene.timeStepProp = bpy.props.IntProperty(name = "Timestep", default = 1)
 
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)
     bpy.types.Scene.genPosYKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Y keyframes", default = True)

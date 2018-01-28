@@ -26,7 +26,7 @@ def addPosXAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = bpy.context.scene.objects.active.location.x - initVal
+        val = round(bpy.context.scene.objects.active.location.x - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -46,7 +46,7 @@ def addPosYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = bpy.context.scene.objects.active.location.y - initVal
+        val = round(bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -66,7 +66,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = -bpy.context.scene.objects.active.location.z - initVal
+        val = round(-bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -86,7 +86,7 @@ def addRotXAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = (bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF;
+        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -106,7 +106,7 @@ def addRotYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = (bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF;
+        val = round((bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -126,7 +126,7 @@ def addRotZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = (-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF;
+        val = round((-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -227,6 +227,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.prop(scene, "genRotZKeyframesProp")
 
         layout.prop(scene, "roundTimeProp")
+        layout.prop(scene, "roundValueProp")
 
         layout.operator(CopyAnimXML.bl_idname)
 
@@ -234,6 +235,7 @@ def register():
     bpy.utils.register_module(__name__)
 
     bpy.types.Scene.roundTimeProp = bpy.props.IntProperty(name = "Time decimal places", default = 3)
+    bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Value (Pos/Rot) decimal places", default = 3)
 
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)
     bpy.types.Scene.genPosYKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Y keyframes", default = True)

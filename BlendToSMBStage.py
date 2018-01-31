@@ -80,7 +80,7 @@ def addPosYAnim(parent):
     hitLast = False
 
     bpy.context.scene.frame_set(0)
-    initVal = bpy.context.scene.objects.active.location.y
+    initVal = -bpy.context.scene.objects.active.location.y
 
     for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
         if i == endFrame:
@@ -89,7 +89,7 @@ def addPosYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
+        val = round(-bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -102,7 +102,7 @@ def addPosYAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
+        val = round(-bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))

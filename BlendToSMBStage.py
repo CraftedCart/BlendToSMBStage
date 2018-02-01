@@ -51,7 +51,7 @@ def addPosXAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.x - initVal, bpy.context.scene.roundValueProp)
+        val = bpy.context.scene.objects.active.location.x - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -64,7 +64,7 @@ def addPosXAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.x - initVal, bpy.context.scene.roundValueProp)
+        val = bpy.context.scene.objects.active.location.x - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -89,7 +89,7 @@ def addPosYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(-bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
+        val = -bpy.context.scene.objects.active.location.y - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -102,7 +102,7 @@ def addPosYAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(-bpy.context.scene.objects.active.location.y - initVal, bpy.context.scene.roundValueProp)
+        val = -bpy.context.scene.objects.active.location.y - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -128,7 +128,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
+        val = bpy.context.scene.objects.active.location.z - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -141,7 +141,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
+        val = bpy.context.scene.objects.active.location.z - initVal
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -166,7 +166,7 @@ def addRotXAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -179,7 +179,7 @@ def addRotXAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((bpy.context.scene.objects.active.rotation_euler.x - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -193,7 +193,7 @@ def addRotYAnim(parent):
     endFrame = bpy.context.scene.frame_end
 
     bpy.context.scene.frame_set(0)
-    initVal = bpy.context.scene.objects.active.rotation_euler.y
+    initVal = -bpy.context.scene.objects.active.rotation_euler.y
 
     hitLast = False
 
@@ -204,7 +204,7 @@ def addRotYAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((-bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -217,7 +217,7 @@ def addRotYAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((-bpy.context.scene.objects.active.rotation_euler.y - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -242,23 +242,27 @@ def addRotZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
         keyframe.set("value", str(val))
         keyframe.set("easing", "LINEAR")
+
+        parent.append(keyframe);
 
     if not hitLast:
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round((-bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 0xFFFF)
+        val = round((bpy.context.scene.objects.active.rotation_euler.z - initVal) / (2 * math.pi) * 360.0)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
         keyframe.set("value", str(val))
         keyframe.set("easing", "LINEAR")
+
+        parent.append(keyframe);
 
 #Operation
 class NewItemGroup(bpy.types.Operator):
@@ -336,13 +340,13 @@ class CopyAnimXML(bpy.types.Operator):
             addRotXAnim(rotX)
             kf.append(rotX)
         if context.scene.genRotYKeyframesProp:
+            rotZ = etree.Element("rotZ")
+            addRotYAnim(rotZ)
+            kf.append(rotY)
+        if context.scene.genRotZKeyframesProp:
             rotY = etree.Element("rotY")
             addRotZAnim(rotY)
             kf.append(rotY)
-        if context.scene.genRotZKeyframesProp:
-            rotZ = etree.Element("rotZ")
-            addRotYAnim(rotZ)
-            kf.append(rotZ)
 
         #Copy the XML to the clipboard
         if platform == "linux" or platform == "linux2":
@@ -382,7 +386,7 @@ class GenerateConfig(bpy.types.Operator):
             igName = etree.SubElement(xig, "name")
             igName.text = ig.name
 
-            # etree.SubElement(xig, "rotationCenter", x = str(ig.location.x), y = str(ig.location.y), z = str(ig.location.z))
+            # etree.SubElement(xig, "rotationCenter", x = str(-ig.location.x), y = str(-ig.location.z), z = str(ig.location.y))
             etree.SubElement(xig, "initialRotation", x = "0", y = "0", z = "0")
             animType = etree.SubElement(xig, "animSeesawType")
             animType.text = "LOOPING_ANIMATION"

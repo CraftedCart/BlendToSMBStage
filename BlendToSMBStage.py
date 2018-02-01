@@ -117,7 +117,7 @@ def addPosZAnim(parent):
     endFrame = bpy.context.scene.frame_end
 
     bpy.context.scene.frame_set(0)
-    initVal = -bpy.context.scene.objects.active.location.z
+    initVal = bpy.context.scene.objects.active.location.z
 
     hitLast = False;
 
@@ -128,7 +128,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(-bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
+        val = round(bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))
@@ -141,7 +141,7 @@ def addPosZAnim(parent):
         bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
-        val = round(-bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
+        val = round(bpy.context.scene.objects.active.location.z - initVal, bpy.context.scene.roundValueProp)
 
         keyframe = etree.Element("keyframe")
         keyframe.set("time", str(seconds))

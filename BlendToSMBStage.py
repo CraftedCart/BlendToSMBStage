@@ -512,7 +512,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.prop(scene, "roundTimeProp")
         layout.prop(scene, "roundValueProp")
-        layout.label("Rotations are always rounded to the nearest int")
+        # layout.label("Rotations are always rounded to the nearest int")
 
         layout.operator(CopyAnimXML.bl_idname)
 

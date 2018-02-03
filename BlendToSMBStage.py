@@ -271,6 +271,9 @@ class NewItemGroup(bpy.types.Operator):
         bpy.context.scene.objects.link(ig)
         ig.empty_draw_type = "ARROWS"
         setItemGroupProperties(ig)
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
 
         return {'FINISHED'}
 
@@ -287,6 +290,9 @@ class NewAnimatedItemGroup(bpy.types.Operator):
         bpy.context.scene.objects.link(ig)
         ig.empty_draw_type = "ARROWS"
         setItemGroupProperties(ig, True)
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
 
         return {'FINISHED'}
 
@@ -317,6 +323,96 @@ class ConvertToAnimtedGroup(bpy.types.Operator):
         obj = bpy.context.scene.objects.active
         setItemGroupProperties(obj, True)
         obj.name = "[IG] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
+class NewGoalB(bpy.types.Operator):
+    bl_idname = "object.new_goal_b"
+    bl_label = "New goal blue"
+    bl_description = "Creates a goal object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[GOAL_B] New goal", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
+class NewGoalG(bpy.types.Operator):
+    bl_idname = "object.new_goal_g"
+    bl_label = "New goal green"
+    bl_description = "Creates a goal object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[GOAL_G] New goal", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
+class NewGoalR(bpy.types.Operator):
+    bl_idname = "object.new_goal_r"
+    bl_label = "New goal red"
+    bl_description = "Creates a goal object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[GOAL_R] New goal", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
+class NewBananaS(bpy.types.Operator):
+    bl_idname = "object.new_banana_s"
+    bl_label = "New banana single"
+    bl_description = "Creates a banana object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[BANANA_S] New banana", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
+class NewBananaB(bpy.types.Operator):
+    bl_idname = "object.new_banana_b"
+    bl_label = "New banana bunch"
+    bl_description = "Creates a banana object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[BANANA_B] New banana", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
 
         return {'FINISHED'}
 
@@ -431,7 +527,7 @@ class GenerateConfig(bpy.types.Operator):
                     type.text = "BLUE"
                     continue
 
-                if "[GOAL_G]" in child.name:
+                elif "[GOAL_G]" in child.name:
                     print("    goal: " + child.name)
                     goal = etree.SubElement(xig, "goal")
                     name = etree.SubElement(goal, "name")
@@ -442,7 +538,7 @@ class GenerateConfig(bpy.types.Operator):
                     type.text = "GREEN"
                     continue
 
-                if "[GOAL_R]" in child.name:
+                elif "[GOAL_R]" in child.name:
                     print("    goal: " + child.name)
                     goal = etree.SubElement(xig, "goal")
                     name = etree.SubElement(goal, "name")
@@ -450,7 +546,27 @@ class GenerateConfig(bpy.types.Operator):
                     etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
                     etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
                     type = etree.SubElement(goal, "type")
-                    type.text = "BLUE"
+                    type.text = "RED"
+                    continue
+
+                elif "[BANANA_S]" in child.name:
+                    print("    banana: " + child.name)
+                    goal = etree.SubElement(xig, "banana")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    type = etree.SubElement(goal, "type")
+                    type.text = "SINGLE"
+                    continue
+
+                elif "[BANANA_B]" in child.name:
+                    print("    banana: " + child.name)
+                    goal = etree.SubElement(xig, "banana")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    type = etree.SubElement(goal, "type")
+                    type.text = "BUNCH"
                     continue
 
                 else:
@@ -465,26 +581,45 @@ class GenerateConfig(bpy.types.Operator):
             #Set this as the active (Required for the addPos/Rot anim, because I'm a lazy sod who can't be bothered to tweak it)
             bpy.context.scene.objects.active = ig
 
-            animKeyframes = etree.SubElement(xig, "animKeyframes")
+            animKeyframes = etree.Element("animKeyframes")
+            hasInserted = False
             #Add animaton if requested
             if "posXAnim" in ig and ig["posXAnim"] != 0:
                 posX = etree.SubElement(animKeyframes, "posX")
                 addPosXAnim(posX)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
             if "posYAnim" in ig and ig["posYAnim"] != 0:
                 posZ = etree.SubElement(animKeyframes, "posZ")
                 addPosYAnim(posZ)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
             if "posZAnim" in ig and ig["posZAnim"] != 0:
                 posY = etree.SubElement(animKeyframes, "posY")
                 addPosZAnim(posY)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
             if "rotXAnim" in ig and ig["rotXAnim"] != 0:
                 rotX = etree.SubElement(animKeyframes, "rotX")
                 addRotXAnim(rotX)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
             if "rotYAnim" in ig and ig["rotYAnim"] != 0:
                 rotZ = etree.SubElement(animKeyframes, "rotZ")
                 addRotYAnim(rotZ)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
             if "rotZAnim" in ig and ig["rotZAnim"] != 0:
                 rotY = etree.SubElement(animKeyframes, "rotY")
                 addRotZAnim(rotY)
+                if not hasInserted:
+                    xig.append(animKeyframes)
+                    hasInserted = True
 
         #Copy the XML to the clipboard
         # if platform == "linux" or platform == "linux2":
@@ -531,6 +666,18 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.operator(ConvertToGroup.bl_idname)
         layout.operator(ConvertToAnimtedGroup.bl_idname)
+
+        layout.separator()
+
+        layout.label("Placeables")
+        layout.label("Don't forget to parent these to an item group")
+
+        layout.operator(NewGoalB.bl_idname)
+        layout.operator(NewGoalG.bl_idname)
+        layout.operator(NewGoalR.bl_idname)
+
+        layout.operator(NewBananaS.bl_idname)
+        layout.operator(NewBananaB.bl_idname)
 
         layout.separator()
 

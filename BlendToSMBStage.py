@@ -420,13 +420,47 @@ class GenerateConfig(bpy.types.Operator):
                 children.append(ig)
 
             for child in children:
-                print("    levelModel: " + child.name)
-                if child.data == None or  child.name == child.data.name:
-                    model = etree.SubElement(xig, "levelModel")
-                    model.text = child.name.replace(" ", "_")
+                if "[GOAL_B]" in child.name:
+                    print("    goal: " + child.name)
+                    goal = etree.SubElement(xig, "goal")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    type = etree.SubElement(goal, "type")
+                    type.text = "BLUE"
+                    continue
+
+                if "[GOAL_G]" in child.name:
+                    print("    goal: " + child.name)
+                    goal = etree.SubElement(xig, "goal")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    type = etree.SubElement(goal, "type")
+                    type.text = "GREEN"
+                    continue
+
+                if "[GOAL_R]" in child.name:
+                    print("    goal: " + child.name)
+                    goal = etree.SubElement(xig, "goal")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    type = etree.SubElement(goal, "type")
+                    type.text = "BLUE"
+                    continue
+
                 else:
-                    model = etree.SubElement(xig, "levelModel")
-                    model.text = (child.name + "_" + child.data.name).replace(" ", "_")
+                    print("    levelModel: " + child.name)
+                    if child.data == None or  child.name == child.data.name:
+                        model = etree.SubElement(xig, "levelModel")
+                        model.text = child.name.replace(" ", "_")
+                    else:
+                        model = etree.SubElement(xig, "levelModel")
+                        model.text = (child.name + "_" + child.data.name).replace(" ", "_")
 
             #Set this as the active (Required for the addPos/Rot anim, because I'm a lazy sod who can't be bothered to tweak it)
             bpy.context.scene.objects.active = ig

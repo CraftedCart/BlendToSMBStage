@@ -159,7 +159,7 @@ def addRotXAnim(parent):
         if 1 == endFrame:
             hitLast = True
 
-        bpy.context.scene.frame_set(endFrame)
+        bpy.context.scene.frame_set(i)
         seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(math.degrees(bpy.context.scene.objects.active.rotation_euler.x), bpy.context.scene.roundValueProp)
@@ -172,7 +172,7 @@ def addRotXAnim(parent):
         parent.append(keyframe);
 
     if not hitLast:
-        bpy.context.scene.frame_set(i)
+        bpy.context.scene.frame_set(endFrame)
         seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(math.degrees(bpy.context.scene.objects.active.rotation_euler.x), bpy.context.scene.roundValueProp)
@@ -406,7 +406,7 @@ class GenerateConfig(bpy.types.Operator):
 
             for child in children:
                 print("    levelModel: " + child.name)
-                if child.name == child.data.name:
+                if child.data == None or  child.name == child.data.name:
                     model = etree.SubElement(xig, "levelModel")
                     model.text = child.name.replace(" ", "_")
                 else:

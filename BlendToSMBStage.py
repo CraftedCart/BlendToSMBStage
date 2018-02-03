@@ -472,7 +472,8 @@ class GenerateConfig(bpy.types.Operator):
     def execute(self, context):
         root = etree.Element("superMonkeyBallStage", version="1.1.0")
         modelImport = etree.SubElement(root, "modelImport")
-        modelImport.text = "//PUT A PATH TO YOUR OBJ HERE"
+        # modelImport.text = "//PUT A PATH TO YOUR OBJ HERE"
+        modelImport.text = context.scene.modelImportProp
 
         start = etree.SubElement(root, "start")
         etree.SubElement(start, "position", x = "0", y = "0", z = "0")
@@ -700,6 +701,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.separator()
 
         layout.prop(scene, "targetConfigProp")
+        layout.prop(scene, "modelImportProp")
         layout.operator(GenerateConfig.bl_idname)
 
 def register():
@@ -713,6 +715,12 @@ def register():
         name = "Target Config File",
         description = "The XML file to write to",
         subtype = 'FILE_PATH'
+    )
+
+    bpy.types.Scene.modelImportProp = bpy.props.StringProperty(
+        name = "Model import",
+        description = "The OBJ file to reference in the config\n\n//filepath.obj for a relative filepath\nfile:///path/to/model.obj for an absolute filepath",
+        default = "//model.obj"
     )
 
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)

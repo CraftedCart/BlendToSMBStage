@@ -368,7 +368,7 @@ class CopyAnimXML(bpy.types.Operator):
 #Operation
 class GenerateConfig(bpy.types.Operator):
     bl_idname = "object.generate_config"
-    bl_label = "Generate config to clipboard"
+    bl_label = "Generate config"
     bl_description = "Generates a config from this scene"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -453,12 +453,22 @@ class GenerateConfig(bpy.types.Operator):
                 addRotZAnim(rotY)
 
         #Copy the XML to the clipboard
-        if platform == "linux" or platform == "linux2":
-            bpy.context.window_manager.clipboard = str(etree.tostring(root, pretty_print = True, encoding = "unicode"))
-        else:
-            bpy.context.window_manager.clipboard = str(etree.tostring(root, encoding = "unicode"))
+        # if platform == "linux" or platform == "linux2":
+            # bpy.context.window_manager.clipboard = str(etree.tostring(root, pretty_print = True, encoding = "unicode"))
+        # else:
+            # bpy.context.window_manager.clipboard = str(etree.tostring(root, encoding = "unicode"))
 
         # self.report({"ERROR"}, "Config copied to clipboard - ready to export an OBJ\nYes animation was deleted, just press Ctrl-Z after exporting\n(No, this isn't an error, I just want it to show at the cursor)")
+
+        config = ""
+        if platform == "linux" or platform == "linux2":
+            config = etree.tostring(root, pretty_print = True, encoding = "unicode")
+        else:
+            config = etree.tostring(root, encoding = "unicode")
+
+        f = open(bpy.path.abspath(context.scene.targetConfigProp), "w")
+        f.write(config)
+        f.close()
 
         return {'FINISHED'}
 
@@ -488,6 +498,8 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.operator(ConvertToGroup.bl_idname)
         layout.operator(ConvertToAnimtedGroup.bl_idname)
 
+        layout.separator()
+
         layout.prop(scene, "genPosXKeyframesProp")
         layout.prop(scene, "genPosYKeyframesProp")
         layout.prop(scene, "genPosZKeyframesProp")
@@ -504,6 +516,9 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.operator(CopyAnimXML.bl_idname)
 
+        layout.separator()
+
+        layout.prop(scene, "targetConfigProp")
         layout.operator(GenerateConfig.bl_idname)
 
 def register():
@@ -512,6 +527,12 @@ def register():
     bpy.types.Scene.roundTimeProp = bpy.props.IntProperty(name = "Time decimal places", default = 3)
     bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Pos/Rot decimal places", default = 3)
     bpy.types.Scene.timeStepProp = bpy.props.IntProperty(name = "Timestep", default = 1)
+
+    bpy.types.Scene.targetConfigProp = bpy.props.StringProperty(
+        name = "Target Config File",
+        description = "The XML file to write to",
+        subtype = 'FILE_PATH'
+    )
 
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)
     bpy.types.Scene.genPosYKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Y keyframes", default = True)
@@ -524,6 +545,12 @@ def register():
 
 def unregister():
     bpy.utils.unregister_module(__name__)
+
+    del bpy.types.Scene.roundTimeProp
+    del bpy.types.Scene.roundValueProp
+    del bpy.types.Scene.timeStepProp
+
+    del bpy.types.Scene.targetConfigProp
 
     del bpy.types.Scene.genPosXKeyframesProp
     del bpy.types.Scene.genPosYKeyframesProp

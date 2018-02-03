@@ -291,6 +291,21 @@ class NewAnimatedItemGroup(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class ConvertToGroup(bpy.types.Operator):
+    bl_idname = "object.convert_to_group"
+    bl_label = "Convert active to non-animated item group"
+    bl_description = "Creates an empty with various custom properties\nParent your object to the empty to add it to the item group"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        obj = bpy.context.scene.objects.active
+        setItemGroupProperties(obj, False)
+        obj.name = "[IG] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
 class ConvertToAnimtedGroup(bpy.types.Operator):
     bl_idname = "object.convert_to_animated_group"
     bl_label = "Convert active to animated item group"
@@ -470,6 +485,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.operator(NewItemGroup.bl_idname)
         layout.operator(NewAnimatedItemGroup.bl_idname)
 
+        layout.operator(ConvertToGroup.bl_idname)
         layout.operator(ConvertToAnimtedGroup.bl_idname)
 
         layout.prop(scene, "genPosXKeyframesProp")

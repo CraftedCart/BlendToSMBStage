@@ -506,9 +506,9 @@ class GenerateConfig(bpy.types.Operator):
                 startPosX = child.location.x
                 startPosY = child.location.z
                 startPosZ = -child.location.y
-                startRotX = child.rotation_euler.x
-                startRotY = child.rotation_euler.z
-                startRotZ = -child.rotation_euler.y
+                startRotX = math.degrees(child.rotation_euler.x)
+                startRotY = math.degrees(child.rotation_euler.z)
+                startRotZ = math.degrees(-child.rotation_euler.y)
 
         start = etree.SubElement(root, "start")
         etree.SubElement(start, "position", x = str(startPosX), y = str(startPosY), z = str(startPosZ))

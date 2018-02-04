@@ -750,6 +750,7 @@ def unregister():
     del bpy.types.Scene.timeStepProp
 
     del bpy.types.Scene.targetConfigProp
+    del bpy.types.Scene.modelImportProp
 
     del bpy.types.Scene.genPosXKeyframesProp
     del bpy.types.Scene.genPosYKeyframesProp

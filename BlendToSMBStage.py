@@ -682,6 +682,16 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.separator()
 
+        layout.label("Active object in SMB coordinate space")
+        layout.label("Pos X: " + str(bpy.context.scene.objects.active.location.x))
+        layout.label("Pos Y: " + str(bpy.context.scene.objects.active.location.z))
+        layout.label("Pos Z: " + str(-bpy.context.scene.objects.active.location.y))
+        layout.label("Rot X: " + str(math.degrees(bpy.context.scene.objects.active.rotation_euler.x)))
+        layout.label("Rot Y: " + str(math.degrees(bpy.context.scene.objects.active.rotation_euler.z)))
+        layout.label("Rot Z: " + str(math.degrees(-bpy.context.scene.objects.active.rotation_euler.y)))
+
+        layout.separator()
+
         layout.prop(scene, "genPosXKeyframesProp")
         layout.prop(scene, "genPosYKeyframesProp")
         layout.prop(scene, "genPosZKeyframesProp")

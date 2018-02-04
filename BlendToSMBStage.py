@@ -327,6 +327,24 @@ class ConvertToAnimtedGroup(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class NewStart(bpy.types.Operator):
+    bl_idname = "object.new_start"
+    bl_label = "New start"
+    bl_description = "Creates a start object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[START]", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
 class NewGoalB(bpy.types.Operator):
     bl_idname = "object.new_goal_b"
     bl_label = "New goal blue"
@@ -475,9 +493,26 @@ class GenerateConfig(bpy.types.Operator):
         # modelImport.text = "//PUT A PATH TO YOUR OBJ HERE"
         modelImport.text = context.scene.modelImportProp
 
+        startPosX = 0.0
+        startPosY = 0.0
+        startPosZ = 0.0
+        startRotX = 0.0
+        startRotY = 0.0
+        startRotZ = 0.0
+
+        children = [ob_child for ob_child in bpy.context.scene.objects]
+        for child in children:
+            if "[START]" in child.name:
+                startPosX = child.location.x
+                startPosY = child.location.z
+                startPosZ = -child.location.y
+                startRotX = child.rotation_euler.x
+                startRotY = child.rotation_euler.z
+                startRotZ = -child.rotation_euler.y
+
         start = etree.SubElement(root, "start")
-        etree.SubElement(start, "position", x = "0", y = "0", z = "0")
-        etree.SubElement(start, "rotation", x = "0", y = "0", z = "0")
+        etree.SubElement(start, "position", x = str(startPosX), y = str(startPosY), z = str(startPosZ))
+        etree.SubElement(start, "rotation", x = str(startRotX), y = str(startRotY), z = str(startRotZ))
 
         etree.SubElement(root, "falloutPlane", y = "-10")
 
@@ -672,6 +707,8 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.label("Placeables")
         layout.label("Don't forget to parent these to an item group")
+
+        layout.operator(NewStart.bl_idname)
 
         layout.operator(NewGoalB.bl_idname)
         layout.operator(NewGoalG.bl_idname)

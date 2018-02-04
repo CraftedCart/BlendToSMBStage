@@ -514,7 +514,7 @@ class GenerateConfig(bpy.types.Operator):
         etree.SubElement(start, "position", x = str(startPosX), y = str(startPosY), z = str(startPosZ))
         etree.SubElement(start, "rotation", x = str(startRotX), y = str(startRotY), z = str(startRotZ))
 
-        etree.SubElement(root, "falloutPlane", y = "-10")
+        etree.SubElement(root, "falloutPlane", y = str(context.scene.falloutProp))
 
         itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
 
@@ -747,6 +747,8 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.separator()
 
+        layout.prop(scene, "falloutProp")
+
         layout.prop(scene, "targetConfigProp")
         layout.prop(scene, "modelImportProp")
         layout.operator(GenerateConfig.bl_idname)
@@ -757,6 +759,8 @@ def register():
     bpy.types.Scene.roundTimeProp = bpy.props.IntProperty(name = "Time decimal places", default = 3)
     bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Pos/Rot decimal places", default = 3)
     bpy.types.Scene.timeStepProp = bpy.props.IntProperty(name = "Timestep", default = 1)
+
+    bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0)
 
     bpy.types.Scene.targetConfigProp = bpy.props.StringProperty(
         name = "Target Config File",
@@ -785,6 +789,8 @@ def unregister():
     del bpy.types.Scene.roundTimeProp
     del bpy.types.Scene.roundValueProp
     del bpy.types.Scene.timeStepProp
+
+    del bpy.types.Scene.falloutProp
 
     del bpy.types.Scene.targetConfigProp
     del bpy.types.Scene.modelImportProp

@@ -518,6 +518,7 @@ class GenerateConfig(bpy.types.Operator):
 
         itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
 
+        etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
         for ig in itemGroups:
             print("Processing item group: " + ig.name)
 

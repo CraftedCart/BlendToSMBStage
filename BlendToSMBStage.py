@@ -678,6 +678,22 @@ class GenerateConfig(bpy.types.Operator):
 
         return {'FINISHED'}
 
+#Operation
+class ExportOBJ(bpy.types.Operator):
+    bl_idname = "object.export_obj"
+    bl_label = "Export OBJ"
+    bl_description = "Exports an OBJ to the path specified in modelImport"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        bpy.ops.export_scene.obj(
+            filepath = bpy.path.abspath(context.scene.modelImportProp),
+            use_triangles = True
+        )
+
+        return {'FINISHED'}
+
 #The tool shelf panel
 class BlendToSMBStagePanel(bpy.types.Panel):
     bl_label = "BlendToSMBStage Tools"
@@ -753,6 +769,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.prop(scene, "targetConfigProp")
         layout.prop(scene, "modelImportProp")
         layout.operator(GenerateConfig.bl_idname)
+        layout.operator(ExportOBJ.bl_idname)
 
 def register():
     bpy.utils.register_module(__name__)
@@ -770,8 +787,9 @@ def register():
     )
 
     bpy.types.Scene.modelImportProp = bpy.props.StringProperty(
-        name = "Model import",
-        description = "The OBJ file to reference in the config\n\n//filepath.obj for a relative filepath\nfile:///path/to/model.obj for an absolute filepath",
+        name = "OBJ path",
+        # description = "The OBJ file to reference in the config\n\n//filepath.obj for a relative filepath\nfile:///path/to/model.obj for an absolute filepath",
+        description = "The path must be relative (Begins with //)",
         default = "//model.obj"
     )
 

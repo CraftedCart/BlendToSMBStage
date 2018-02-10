@@ -327,6 +327,21 @@ class ConvertToAnimtedGroup(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class ConvertToBackground(bpy.types.Operator):
+    bl_idname = "object.convert_to_background"
+    bl_label = "Convert selected to background object(s)"
+    bl_description = "Converts the selected objects to item groups"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        for obj in bpy.context.selected_objects:
+            setItemGroupProperties(obj, False)
+            obj.name = "[BG] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
 class NewStart(bpy.types.Operator):
     bl_idname = "object.new_start"
     bl_label = "New start"
@@ -516,6 +531,21 @@ class GenerateConfig(bpy.types.Operator):
 
         etree.SubElement(root, "falloutPlane", y = str(context.scene.falloutProp))
 
+        #Find and export backgrounds
+        backgrounds = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[BG]")]
+        for ig in backgrounds:
+            print("Processing background: " + ig.name)
+
+            xig = etree.SubElement(root, "backgroundModel")
+
+            if ig.data == None or ig.name == ig.data.name:
+                model = etree.SubElement(xig, "name")
+                model.text = ig.name.replace(" ", "_")
+            else:
+                model = etree.SubElement(xig, "name")
+                model.text = (ig.name + "_" + ig.data.name).replace(" ", "_")
+
+        #Find and export item groups
         itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
 
         etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
@@ -719,6 +749,7 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.operator(ConvertToGroup.bl_idname)
         layout.operator(ConvertToAnimtedGroup.bl_idname)
+        layout.operator(ConvertToBackground.bl_idname)
 
         layout.separator()
 

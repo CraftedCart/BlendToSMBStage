@@ -548,7 +548,12 @@ class GenerateConfig(bpy.types.Operator):
         #Find and export item groups
         itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
 
-        etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
+        dummyIg = etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
+        grid = etree.SubElement(dummyIg, "collisionGrid")
+        etree.SubElement(grid, "start", x = "-256", z = "-256")
+        etree.SubElement(grid, "step", x = "32", z = "32")
+        etree.SubElement(grid, "count", x = "16", z = "16")
+
         for ig in itemGroups:
             print("Processing item group: " + ig.name)
 

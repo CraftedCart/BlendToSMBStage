@@ -450,6 +450,24 @@ class NewBananaB(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class NewBumper(bpy.types.Operator):
+    bl_idname = "object.new_bumper"
+    bl_label = "New bumper"
+    bl_description = "Creates a bumper object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[BUMPER] New bumper", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
     bl_label = "Copy animation XML for active object to clipboard"
@@ -641,6 +659,16 @@ class GenerateConfig(bpy.types.Operator):
                     type.text = "BUNCH"
                     continue
 
+                elif "[BUMPER]" in child.name:
+                    print("    bumper: " + child.name)
+                    goal = etree.SubElement(xig, "bumper")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
+                    continue
+
                 else:
                     print("    levelModel: " + child.name)
                     if child.data == None or  child.name == child.data.name:
@@ -769,6 +797,8 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.operator(NewBananaS.bl_idname)
         layout.operator(NewBananaB.bl_idname)
+
+        layout.operator(NewBumper.bl_idname)
 
         layout.separator()
 

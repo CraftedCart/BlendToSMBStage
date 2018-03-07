@@ -1,6 +1,8 @@
 import bpy
+import bgl
 from sys import platform
 import math
+import threading
 
 if platform == "linux" or platform == "linux2":
     from lxml import etree
@@ -757,10 +759,10 @@ class ExportOBJ(bpy.types.Operator):
 
         return {'FINISHED'}
 
-#The tool shelf panel
-class BlendToSMBStagePanel(bpy.types.Panel):
-    bl_label = "BlendToSMBStage Tools"
-    bl_idname = "blend_to_smb_stage_tools"
+#Tool shelf panel
+class SceneGraphPanel(bpy.types.Panel):
+    bl_label = "Scene Graph"
+    bl_idname = "blend_to_smb_stage_scene_graph_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS" #Put the menu on the left tool shelf
     bl_category = "BlendToSMBStage" #Tab name of the tool shelf
@@ -791,16 +793,37 @@ class BlendToSMBStagePanel(bpy.types.Panel):
 
         layout.operator(NewStart.bl_idname)
 
-        layout.operator(NewGoalB.bl_idname)
-        layout.operator(NewGoalG.bl_idname)
-        layout.operator(NewGoalR.bl_idname)
+        row = layout.row()
+        row.operator(NewGoalB.bl_idname)
+        row.operator(NewGoalG.bl_idname)
+        row.operator(NewGoalR.bl_idname)
 
-        layout.operator(NewBananaS.bl_idname)
-        layout.operator(NewBananaB.bl_idname)
+        row = layout.row()
+        row.operator(NewBananaS.bl_idname)
+        row.operator(NewBananaB.bl_idname)
 
         layout.operator(NewBumper.bl_idname)
 
         layout.separator()
+
+        layout.prop(scene, "falloutProp")
+
+#Tool shelf panel
+class DetailsPanel(bpy.types.Panel):
+    bl_label = "Details"
+    bl_idname = "blend_to_smb_stage_details_panel"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS" #Put the menu on the left tool shelf
+    bl_category = "BlendToSMBStage" #Tab name of the tool shelf
+    bl_context = (("objectmode"))
+    bl_options = {'DEFAULT_CLOSED'}
+
+    #Menu and input
+    def draw(self, context):
+        obj = context.object
+        scene = context.scene
+
+        layout = self.layout
 
         layout.label("Active object in SMB coordinate space")
         layout.label("Pos X: " + str(bpy.context.scene.objects.active.location.x))
@@ -810,7 +833,57 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.label("Rot Y: " + str(math.degrees(bpy.context.scene.objects.active.rotation_euler.z)))
         layout.label("Rot Z: " + str(math.degrees(-bpy.context.scene.objects.active.rotation_euler.y)))
 
-        layout.separator()
+#Tool shelf panel
+class ExportScenePanel(bpy.types.Panel):
+    bl_label = "Export Scene"
+    bl_idname = "blend_to_smb_stage_export_scene_panel"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS" #Put the menu on the left tool shelf
+    bl_category = "BlendToSMBStage" #Tab name of the tool shelf
+    bl_context = (("objectmode"))
+
+    #Menu and input
+    def draw(self, context):
+        obj = context.object
+        scene = context.scene
+
+        layout = self.layout
+
+        layout.label("Lower timestep = more keyframes")
+        layout.prop(scene, "timeStepProp")
+
+        layout.prop(scene, "roundTimeProp")
+        layout.prop(scene, "roundValueProp")
+
+        layout.prop(scene, "targetConfigProp")
+        layout.prop(scene, "modelImportProp")
+        layout.operator(GenerateConfig.bl_idname)
+        layout.operator(ExportOBJ.bl_idname)
+
+#Tool shelf panel
+class ExportAnimPanel(bpy.types.Panel):
+    bl_idname = "blend_to_smb_stage_export_anim_panel"
+    bl_label = "Export Object Animation"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS" #Put the menu on the left tool shelf
+    bl_category = "BlendToSMBStage" #Tab name of the tool shelf
+    bl_context = (("objectmode"))
+    bl_options = {'DEFAULT_CLOSED'}
+
+    #Menu and input
+    def draw(self, context):
+        obj = context.object
+        scene = context.scene
+
+        layout = self.layout
+
+        layout.label("Lower timestep = more keyframes")
+        layout.prop(scene, "timeStepProp")
+
+        layout.prop(scene, "roundTimeProp")
+        layout.prop(scene, "roundValueProp")
+
+        layout.label("Export single object animation")
 
         layout.prop(scene, "genPosXKeyframesProp")
         layout.prop(scene, "genPosYKeyframesProp")
@@ -819,23 +892,114 @@ class BlendToSMBStagePanel(bpy.types.Panel):
         layout.prop(scene, "genRotYKeyframesProp")
         layout.prop(scene, "genRotZKeyframesProp")
 
-        layout.label("Lower timestep = more keyframes")
-        layout.prop(scene, "timeStepProp")
-
-        layout.prop(scene, "roundTimeProp")
-        layout.prop(scene, "roundValueProp")
-        # layout.label("Rotations are always rounded to the nearest int")
-
         layout.operator(CopyAnimXML.bl_idname)
 
-        layout.separator()
+#Tool shelf panel
+class DebugPanel(bpy.types.Panel):
+    bl_idname = "blend_to_smb_debug_anim_panel"
+    bl_label = "Debug"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS" #Put the menu on the left tool shelf
+    bl_category = "BlendToSMBStage" #Tab name of the tool shelf
+    bl_context = (("objectmode"))
+    bl_options = {'DEFAULT_CLOSED'}
 
-        layout.prop(scene, "falloutProp")
+    #Menu and input
+    def draw(self, context):
+        obj = context.object
+        scene = context.scene
 
-        layout.prop(scene, "targetConfigProp")
-        layout.prop(scene, "modelImportProp")
-        layout.operator(GenerateConfig.bl_idname)
-        layout.operator(ExportOBJ.bl_idname)
+        layout = self.layout
+
+        layout.prop(scene, "redrawCounterProp")
+        layout.prop(scene, "drawFalloutProp")
+
+def falloutUpdate(self, context):
+    context.scene.drawFalloutProp = True
+    context.scene.redrawCounterProp = 180
+
+    forceRedrawLoop(context, context.area, True);
+
+#Drawing stuff below
+def drawGrid(start, space, repeat, z):
+    bgl.glBegin(bgl.GL_LINES)
+
+    for i in range(0, repeat + 1):
+        bgl.glVertex3f(start + space * i, -start, z)
+        bgl.glVertex3f(start + space * i, start, z)
+
+        bgl.glVertex3f(-start, start + space * i, z)
+        bgl.glVertex3f(start, start + space * i, z)
+
+    bgl.glEnd()
+
+def drawSphere(posX, posY, posZ, radius):
+    bgl.glBegin(bgl.GL_LINE_STRIP)
+    for i in range(0, 17):
+        normI = i / 16
+
+        x = posX + radius * math.cos(normI * math.pi * 2)
+        y = posY + radius * math.sin(normI * math.pi * 2)
+        bgl.glVertex3f(x, y, posZ)
+    bgl.glEnd()
+
+    bgl.glBegin(bgl.GL_LINE_STRIP)
+    for i in range(0, 17):
+        normI = i / 16
+
+        x = posX + radius * math.cos(normI * math.pi * 2)
+        z = posZ + radius * math.sin(normI * math.pi * 2)
+        bgl.glVertex3f(x, posY, z)
+    bgl.glEnd()
+
+    bgl.glBegin(bgl.GL_LINE_STRIP)
+    for i in range(0, 17):
+        normI = i / 16
+
+        y = posY + radius * math.cos(normI * math.pi * 2)
+        z = posZ + radius * math.sin(normI * math.pi * 2)
+        bgl.glVertex3f(posX, y, z)
+    bgl.glEnd()
+
+def drawCallback3d():
+    bgl.glEnable(bgl.GL_BLEND)
+    bgl.glLineWidth(4)
+
+    #Fallout
+    if bpy.context.scene.drawFalloutProp:
+        bgl.glColor4f(0.96, 0.26, 0.21, min(bpy.context.scene.redrawCounterProp / 60.0, 1) * 0.3)
+        drawGrid(-512, 4, 256, bpy.context.scene.falloutProp)
+
+    #Draw start spheres
+    posX = 0.0
+    posY = 0.0
+    posZ = 10.0
+
+    bgl.glColor4f(0.13, 0.59, 0.95, 0.8)
+
+    starts = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[START]")]
+
+    for start in starts:
+        drawSphere(start.location.x, start.location.y, start.location.z, 0.5)
+
+    #Restore OpenGL defaults
+    bgl.glLineWidth(1)
+    bgl.glDisable(bgl.GL_BLEND)
+    bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
+
+def forceRedrawLoop(context, area, isInit):
+    if (context.scene.isInForceRenderLoop and isInit): return
+
+    context.scene.isInForceRenderLoop = True
+
+    area.tag_redraw()
+    context.scene.redrawCounterProp -= 1
+
+    if context.scene.redrawCounterProp > 0:
+        threading.Timer(0.016, forceRedrawLoop, [context, area, False]).start()
+    else:
+        bpy.context.scene.drawFalloutProp = False
+        context.scene.isInForceRenderLoop = False
 
 def register():
     bpy.utils.register_module(__name__)
@@ -844,12 +1008,13 @@ def register():
     bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Pos/Rot decimal places", default = 3)
     bpy.types.Scene.timeStepProp = bpy.props.IntProperty(name = "Timestep", default = 1)
 
-    bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0)
+    bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0, update = falloutUpdate)
 
     bpy.types.Scene.targetConfigProp = bpy.props.StringProperty(
         name = "Target Config File",
         description = "The XML file to write to",
-        subtype = 'FILE_PATH'
+        subtype = 'FILE_PATH',
+        default = "//config.xml"
     )
 
     bpy.types.Scene.modelImportProp = bpy.props.StringProperty(
@@ -865,6 +1030,20 @@ def register():
     bpy.types.Scene.genRotXKeyframesProp = bpy.props.BoolProperty(name = "Generate Rot X keyframes", default = True)
     bpy.types.Scene.genRotYKeyframesProp = bpy.props.BoolProperty(name = "Generate Rot Y keyframes", default = True)
     bpy.types.Scene.genRotZKeyframesProp = bpy.props.BoolProperty(name = "Generate Rot Z keyframes", default = True)
+
+    #Rendering
+    bpy.types.Scene.redrawCounterProp = bpy.props.IntProperty(name = "redrawCounterProp", default = 60)
+    bpy.types.Scene.drawFalloutProp = bpy.props.BoolProperty(name = "drawFallout", default = False)
+
+    bpy.types.Scene.isInForceRenderLoop = bpy.props.BoolProperty(name = "isInForceRenderLoop", default = False)
+
+    #Idk the proper way of doing this
+    try:
+        bpy.types.SpaceView3D.draw_handler_remove(bpy.types.Scene.blendToSmbStageDrawCallback3d, 'WINDOW')
+    except AttributeError:
+        pass
+
+    bpy.types.Scene.blendToSmbStageDrawCallback3d = bpy.types.SpaceView3D.draw_handler_add(drawCallback3d, (), 'WINDOW', 'POST_VIEW')
 
     print("BlendToSMBStage registered")
 
@@ -886,6 +1065,9 @@ def unregister():
     del bpy.types.Scene.genRotXKeyframesProp
     del bpy.types.Scene.genRotYKeyframesProp
     del bpy.types.Scene.genRotZKeyframesProp
+
+    bpy.types.SpaceView3D.draw_handler_remove(bpy.types.Scene.blendToSmbStageDrawCallback3d, 'WINDOW')
+    del bpy.types.Scene.blendToSmbStageDrawCallback3d
 
     print("BlendToSMBStage unreigstered")
 

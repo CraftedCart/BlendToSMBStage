@@ -37,6 +37,16 @@ def setItemGroupProperties(ig, animated = False):
     ig["rotYAnim"] = animated
     ig["rotZAnim"] = animated
 
+def isItemGroupAnimated(ig):
+    if "posXAnim" in ig and ig["posXAnim"] == 1: return True
+    if "posYAnim" in ig and ig["posYAnim"] == 1: return True
+    if "posZAnim" in ig and ig["posZAnim"] == 1: return True
+    if "rotXAnim" in ig and ig["rotXAnim"] == 1: return True
+    if "rotYAnim" in ig and ig["rotYAnim"] == 1: return True
+    if "rotZAnim" in ig and ig["rotZAnim"] == 1: return True
+
+    return False
+
 def addPosXAnim(parent):
     startFrame = bpy.context.scene.frame_start
     endFrame = bpy.context.scene.frame_end
@@ -570,6 +580,7 @@ class GenerateConfig(bpy.types.Operator):
 
         dummyIg = etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
         grid = etree.SubElement(dummyIg, "collisionGrid")
+
         etree.SubElement(grid, "start", x = "-256", z = "-256")
         etree.SubElement(grid, "step", x = "32", z = "32")
         etree.SubElement(grid, "count", x = "16", z = "16")
@@ -594,11 +605,18 @@ class GenerateConfig(bpy.types.Operator):
             animLoopTime = etree.SubElement(xig, "animLoopTime") #TODO: Allow different loop times per item group
             animLoopTime.text = str(bpy.context.scene.frame_end / 60.0)
 
-            #Collision grid #TODO: Adjustible collision grid
             grid = etree.SubElement(xig, "collisionGrid")
-            etree.SubElement(grid, "start", x = "-256", z = "-256")
-            etree.SubElement(grid, "step", x = "32", z = "32")
-            etree.SubElement(grid, "count", x = "16", z = "16")
+
+            collisionStartX = ig["collisionStartX"]
+            collisionStartY = ig["collisionStartY"]
+            collisionStepX = ig["collisionStepX"]
+            collisionStepY = ig["collisionStepY"]
+            collisionStepCountX = ig["collisionStepCountX"]
+            collisionStepCountY = ig["collisionStepCountY"]
+
+            etree.SubElement(grid, "start", x = str(collisionStartX), z = str(collisionStartY))
+            etree.SubElement(grid, "step", x = str(collisionStepX), z = str(collisionStepY))
+            etree.SubElement(grid, "count", x = str(collisionStepCountX), z = str(collisionStepCountY))
 
             #Find all level models who are children of this item group
             children = [ob_child for ob_child in bpy.context.scene.objects if ob_child.parent == ig]
@@ -834,6 +852,8 @@ class DetailsPanel(bpy.types.Panel):
         layout.label("Rot Y: " + str(math.degrees(bpy.context.scene.objects.active.rotation_euler.z)))
         layout.label("Rot Z: " + str(math.degrees(-bpy.context.scene.objects.active.rotation_euler.y)))
 
+        layout.prop(scene, "drawCollisionGridProp")
+
 #Tool shelf panel
 class ExportScenePanel(bpy.types.Panel):
     bl_label = "Export Scene"
@@ -922,15 +942,16 @@ class ExportAnimPanel(bpy.types.Panel):
     # forceRedrawLoop(context, context.area, True);
 
 #Drawing stuff below
-def drawGrid(start, space, repeat, z):
+def drawGrid(startX, startY, spaceX, spaceY, repeatX, repeatY, z):
     bgl.glBegin(bgl.GL_LINES)
 
-    for i in range(0, repeat + 1):
-        bgl.glVertex3f(start + space * i, -start, z)
-        bgl.glVertex3f(start + space * i, start, z)
+    for i in range(0, repeatX + 1):
+        bgl.glVertex3f(startX + spaceX * i, startY, z)
+        bgl.glVertex3f(startX + spaceX * i, startY + spaceY * repeatY, z)
 
-        bgl.glVertex3f(-start, start + space * i, z)
-        bgl.glVertex3f(start, start + space * i, z)
+    for i in range(0, repeatY + 1):
+        bgl.glVertex3f(startX, startY + spaceY * i, z)
+        bgl.glVertex3f(startX + spaceX * repeatX, startY + spaceY * i, z)
 
     bgl.glEnd()
 
@@ -970,7 +991,42 @@ def drawCallback3d():
     if bpy.context.scene.drawFalloutProp:
         # bgl.glColor4f(0.96, 0.26, 0.21, min(bpy.context.scene.redrawCounterProp / 60.0, 1) * 0.3)
         bgl.glColor4f(0.96, 0.26, 0.21, 0.3)
-        drawGrid(-512, 4, 256, bpy.context.scene.falloutProp)
+        drawGrid(-512, -512, 4, 4, 256, 256, bpy.context.scene.falloutProp)
+
+    #Collision grids
+    itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
+
+    if bpy.context.scene.drawCollisionGridProp:
+        for ig in itemGroups:
+            if ig in bpy.context.selected_objects:
+                if ig != None and ig.name.startswith("[IG]"):
+                    bgl.glColor4f(0.30, 0.69, 0.31, 0.5)
+                    collisionStartX = ig["collisionStartX"]
+                    collisionStartY = ig["collisionStartY"]
+                    collisionStepX = ig["collisionStepX"]
+                    collisionStepY = ig["collisionStepY"]
+                    collisionStepCountX = ig["collisionStepCountX"]
+                    collisionStepCountY = ig["collisionStepCountY"]
+
+                    animated = isItemGroupAnimated(ig)
+
+                    #Only transform if animated
+                    if animated:
+                        bgl.glPushMatrix()
+                        bgl.glTranslatef(ig.location.x, ig.location.y, ig.location.z)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.x), 1.0, 0.0, 0.0)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.z), 0.0, 0.0, 1.0)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.y), 0.0, 1.0, 0.0)
+
+                    drawGrid(collisionStartX, -collisionStartY, collisionStepX, -collisionStepY, collisionStepCountX, collisionStepCountY, 0)
+
+                    bgl.glDisable(bgl.GL_DEPTH_TEST)
+                    bgl.glColor4f(0.30, 0.69, 0.31, 0.3)
+                    drawGrid(collisionStartX, -collisionStartY, collisionStepX, -collisionStepY, collisionStepCountX, collisionStepCountY, 0)
+                    bgl.glEnable(bgl.GL_DEPTH_TEST)
+
+                    if animated:
+                        bgl.glPopMatrix()
 
     #Draw start spheres
     posX = 0.0
@@ -1037,6 +1093,7 @@ def register():
     #Rendering
     # bpy.types.Scene.redrawCounterProp = bpy.props.IntProperty(name = "redrawCounterProp", default = 60)
     bpy.types.Scene.drawFalloutProp = bpy.props.BoolProperty(name = "Draw fallout plane", default = False)
+    bpy.types.Scene.drawCollisionGridProp = bpy.props.BoolProperty(name = "Draw collision grid", default = True)
 
     bpy.types.Scene.isInForceRenderLoop = bpy.props.BoolProperty(name = "isInForceRenderLoop", default = False)
 
@@ -1071,6 +1128,7 @@ def unregister():
 
     # del bpy.types.Scene.redrawCounterProp
     del bpy.types.Scene.drawFalloutProp
+    del bpy.types.Scene.drawCollisionGridProp
 
     bpy.types.SpaceView3D.draw_handler_remove(bpy.types.Scene.blendToSmbStageDrawCallback3d, 'WINDOW')
     del bpy.types.Scene.blendToSmbStageDrawCallback3d

@@ -1012,8 +1012,17 @@ def drawCallback3d():
 
                     #Only transform if animated
                     if animated:
+                        origFrame = bpy.context.scene.frame_current
+                        bpy.context.scene.frame_set(0)
+
+                        origX = ig.location.x
+                        origY = ig.location.y
+                        origZ = ig.location.z
+
+                        bpy.context.scene.frame_set(origFrame)
+
                         bgl.glPushMatrix()
-                        bgl.glTranslatef(ig.location.x, ig.location.y, ig.location.z)
+                        bgl.glTranslatef(ig.location.x - origX, ig.location.y - origY, ig.location.z - origZ)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.x), 1.0, 0.0, 0.0)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.z), 0.0, 0.0, 1.0)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.y), 0.0, 1.0, 0.0)

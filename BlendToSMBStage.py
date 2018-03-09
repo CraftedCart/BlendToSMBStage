@@ -1022,10 +1022,10 @@ def drawCallback3d():
                         bpy.context.scene.frame_set(origFrame)
 
                         bgl.glPushMatrix()
-                        bgl.glTranslatef(ig.location.x - origX, ig.location.y - origY, ig.location.z - origZ)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.x), 1.0, 0.0, 0.0)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.z), 0.0, 0.0, 1.0)
                         bgl.glRotatef(math.degrees(ig.rotation_euler.y), 0.0, 1.0, 0.0)
+                        bgl.glTranslatef(ig.location.x - origX, ig.location.y - origY, ig.location.z - origZ)
 
                     drawGrid(collisionStartX, -collisionStartY, collisionStepX, -collisionStepY, collisionStepCountX, collisionStepCountY, 0)
 

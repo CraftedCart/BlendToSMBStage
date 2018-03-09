@@ -1018,13 +1018,16 @@ def drawCallback3d():
                         origX = ig.location.x
                         origY = ig.location.y
                         origZ = ig.location.z
+                        origRotX = ig.rotation_euler.x
+                        origRotY = ig.rotation_euler.y
+                        origRotZ = ig.rotation_euler.z
 
                         bpy.context.scene.frame_set(origFrame)
 
                         bgl.glPushMatrix()
-                        bgl.glRotatef(math.degrees(ig.rotation_euler.x), 1.0, 0.0, 0.0)
-                        bgl.glRotatef(math.degrees(ig.rotation_euler.z), 0.0, 0.0, 1.0)
-                        bgl.glRotatef(math.degrees(ig.rotation_euler.y), 0.0, 1.0, 0.0)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.x - origRotX), 1.0, 0.0, 0.0)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.z - origRotZ), 0.0, 0.0, 1.0)
+                        bgl.glRotatef(math.degrees(ig.rotation_euler.y - origRotY), 0.0, 1.0, 0.0)
                         bgl.glTranslatef(ig.location.x - origX, ig.location.y - origY, ig.location.z - origZ)
 
                     drawGrid(collisionStartX, -collisionStartY, collisionStepX, -collisionStepY, collisionStepCountX, collisionStepCountY, 0)

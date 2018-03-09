@@ -807,6 +807,7 @@ class SceneGraphPanel(bpy.types.Panel):
         layout.separator()
 
         layout.prop(scene, "falloutProp")
+        layout.prop(scene, "drawFalloutProp")
 
 #Tool shelf panel
 class DetailsPanel(bpy.types.Panel):
@@ -895,30 +896,30 @@ class ExportAnimPanel(bpy.types.Panel):
         layout.operator(CopyAnimXML.bl_idname)
 
 #Tool shelf panel
-class DebugPanel(bpy.types.Panel):
-    bl_idname = "blend_to_smb_debug_anim_panel"
-    bl_label = "Debug"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS" #Put the menu on the left tool shelf
-    bl_category = "BlendToSMBStage" #Tab name of the tool shelf
-    bl_context = (("objectmode"))
-    bl_options = {'DEFAULT_CLOSED'}
+# class DebugPanel(bpy.types.Panel):
+    # bl_idname = "blend_to_smb_debug_anim_panel"
+    # bl_label = "Debug"
+    # bl_space_type = "VIEW_3D"
+    # bl_region_type = "TOOLS" #Put the menu on the left tool shelf
+    # bl_category = "BlendToSMBStage" #Tab name of the tool shelf
+    # bl_context = (("objectmode"))
+    # bl_options = {'DEFAULT_CLOSED'}
 
-    #Menu and input
-    def draw(self, context):
-        obj = context.object
-        scene = context.scene
+    # #Menu and input
+    # def draw(self, context):
+        # obj = context.object
+        # scene = context.scene
 
-        layout = self.layout
+        # layout = self.layout
 
-        layout.prop(scene, "redrawCounterProp")
-        layout.prop(scene, "drawFalloutProp")
+        # layout.prop(scene, "redrawCounterProp")
+        # layout.prop(scene, "drawFalloutProp")
 
-def falloutUpdate(self, context):
-    context.scene.drawFalloutProp = True
-    context.scene.redrawCounterProp = 180
+# def falloutUpdate(self, context):
+    # context.scene.drawFalloutProp = True
+    # context.scene.redrawCounterProp = 180
 
-    forceRedrawLoop(context, context.area, True);
+    # forceRedrawLoop(context, context.area, True);
 
 #Drawing stuff below
 def drawGrid(start, space, repeat, z):
@@ -967,7 +968,8 @@ def drawCallback3d():
 
     #Fallout
     if bpy.context.scene.drawFalloutProp:
-        bgl.glColor4f(0.96, 0.26, 0.21, min(bpy.context.scene.redrawCounterProp / 60.0, 1) * 0.3)
+        # bgl.glColor4f(0.96, 0.26, 0.21, min(bpy.context.scene.redrawCounterProp / 60.0, 1) * 0.3)
+        bgl.glColor4f(0.96, 0.26, 0.21, 0.3)
         drawGrid(-512, 4, 256, bpy.context.scene.falloutProp)
 
     #Draw start spheres
@@ -987,19 +989,19 @@ def drawCallback3d():
     bgl.glDisable(bgl.GL_BLEND)
     bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
 
-def forceRedrawLoop(context, area, isInit):
-    if (context.scene.isInForceRenderLoop and isInit): return
+# def forceRedrawLoop(context, area, isInit):
+    # if (context.scene.isInForceRenderLoop and isInit): return
 
-    context.scene.isInForceRenderLoop = True
+    # context.scene.isInForceRenderLoop = True
 
-    area.tag_redraw()
-    context.scene.redrawCounterProp -= 1
+    # area.tag_redraw()
+    # context.scene.redrawCounterProp -= 1
 
-    if context.scene.redrawCounterProp > 0:
-        threading.Timer(0.016, forceRedrawLoop, [context, area, False]).start()
-    else:
-        bpy.context.scene.drawFalloutProp = False
-        context.scene.isInForceRenderLoop = False
+    # if context.scene.redrawCounterProp > 0:
+        # threading.Timer(0.016, forceRedrawLoop, [context, area, False]).start()
+    # else:
+        # bpy.context.scene.drawFalloutProp = False
+        # context.scene.isInForceRenderLoop = False
 
 def register():
     bpy.utils.register_module(__name__)
@@ -1008,7 +1010,8 @@ def register():
     bpy.types.Scene.roundValueProp = bpy.props.IntProperty(name = "Pos/Rot decimal places", default = 3)
     bpy.types.Scene.timeStepProp = bpy.props.IntProperty(name = "Timestep", default = 1)
 
-    bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0, update = falloutUpdate)
+    # bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0, update = falloutUpdate)
+    bpy.types.Scene.falloutProp = bpy.props.FloatProperty(name = "Fallout Y", default = -10.0)
 
     bpy.types.Scene.targetConfigProp = bpy.props.StringProperty(
         name = "Target Config File",
@@ -1032,8 +1035,8 @@ def register():
     bpy.types.Scene.genRotZKeyframesProp = bpy.props.BoolProperty(name = "Generate Rot Z keyframes", default = True)
 
     #Rendering
-    bpy.types.Scene.redrawCounterProp = bpy.props.IntProperty(name = "redrawCounterProp", default = 60)
-    bpy.types.Scene.drawFalloutProp = bpy.props.BoolProperty(name = "drawFallout", default = False)
+    # bpy.types.Scene.redrawCounterProp = bpy.props.IntProperty(name = "redrawCounterProp", default = 60)
+    bpy.types.Scene.drawFalloutProp = bpy.props.BoolProperty(name = "Draw fallout plane", default = False)
 
     bpy.types.Scene.isInForceRenderLoop = bpy.props.BoolProperty(name = "isInForceRenderLoop", default = False)
 
@@ -1065,6 +1068,9 @@ def unregister():
     del bpy.types.Scene.genRotXKeyframesProp
     del bpy.types.Scene.genRotYKeyframesProp
     del bpy.types.Scene.genRotZKeyframesProp
+
+    # del bpy.types.Scene.redrawCounterProp
+    del bpy.types.Scene.drawFalloutProp
 
     bpy.types.SpaceView3D.draw_handler_remove(bpy.types.Scene.blendToSmbStageDrawCallback3d, 'WINDOW')
     del bpy.types.Scene.blendToSmbStageDrawCallback3d

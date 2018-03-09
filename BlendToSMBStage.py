@@ -789,7 +789,7 @@ class SceneGraphPanel(bpy.types.Panel):
         layout.separator()
 
         layout.label("Placeables")
-        layout.label("Don't forget to parent these to an item group")
+        layout.label("Don't forget to parent these to an item group (Excl. Start)")
 
         layout.operator(NewStart.bl_idname)
 

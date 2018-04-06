@@ -627,13 +627,16 @@ class GenerateConfig(bpy.types.Operator):
                 children.append(ig)
 
             for child in children:
+                loc = child.matrix_world.to_translation()
+                rot = child.matrix_world.to_euler("XZY")
+
                 if "[GOAL_B]" in child.name:
                     print("    goal: " + child.name)
                     goal = etree.SubElement(xig, "goal")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
-                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
                     type = etree.SubElement(goal, "type")
                     type.text = "BLUE"
                     continue
@@ -643,8 +646,8 @@ class GenerateConfig(bpy.types.Operator):
                     goal = etree.SubElement(xig, "goal")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
-                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
                     type = etree.SubElement(goal, "type")
                     type.text = "GREEN"
                     continue
@@ -654,8 +657,8 @@ class GenerateConfig(bpy.types.Operator):
                     goal = etree.SubElement(xig, "goal")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
-                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
                     type = etree.SubElement(goal, "type")
                     type.text = "RED"
                     continue
@@ -665,7 +668,7 @@ class GenerateConfig(bpy.types.Operator):
                     goal = etree.SubElement(xig, "banana")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
                     type = etree.SubElement(goal, "type")
                     type.text = "SINGLE"
                     continue
@@ -675,7 +678,7 @@ class GenerateConfig(bpy.types.Operator):
                     goal = etree.SubElement(xig, "banana")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
                     type = etree.SubElement(goal, "type")
                     type.text = "BUNCH"
                     continue
@@ -685,8 +688,8 @@ class GenerateConfig(bpy.types.Operator):
                     goal = etree.SubElement(xig, "bumper")
                     name = etree.SubElement(goal, "name")
                     name.text = child.name
-                    etree.SubElement(goal, "position", x = str(child.location.x), y = str(child.location.z), z = str(-child.location.y))
-                    etree.SubElement(goal, "rotation", x = str(math.degrees(child.rotation_euler.x)), y = str(math.degrees(child.rotation_euler.z)), z = str(math.degrees(-child.rotation_euler.y)))
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
                     etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
                     continue
 

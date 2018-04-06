@@ -3,6 +3,7 @@ import bgl
 from sys import platform
 import math
 import threading
+import os
 
 if platform == "linux" or platform == "linux2":
     from lxml import etree
@@ -876,8 +877,13 @@ class ExportScenePanel(bpy.types.Panel):
         layout.prop(scene, "roundTimeProp")
         layout.prop(scene, "roundValueProp")
 
-        layout.prop(scene, "targetConfigProp")
-        layout.prop(scene, "modelImportProp")
+        layout.prop(scene, "autoPathsProp")
+        col = layout.column()
+        col.enabled = not context.scene.autoPathsProp
+        col.prop(scene, "targetConfigProp")
+        col.prop(scene, "modelImportProp")
+
+
         layout.operator(GenerateConfig.bl_idname)
         layout.operator(ExportOBJ.bl_idname)
 
@@ -1071,6 +1077,11 @@ def drawCallback3d():
         # bpy.context.scene.drawFalloutProp = False
         # context.scene.isInForceRenderLoop = False
 
+def autoPathNames(self, context):
+    if context.scene.autoPathsProp:
+        context.scene.targetConfigProp = "//" + os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0] + ".xml"
+        context.scene.modelImportProp = "//" + os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0] + ".obj"
+
 def register():
     bpy.utils.register_module(__name__)
 
@@ -1095,6 +1106,8 @@ def register():
         default = "//model.obj"
     )
 
+    bpy.types.Scene.autoPathsProp = bpy.props.BoolProperty(name = "Automatic path names", default = True, update = autoPathNames)
+
     bpy.types.Scene.genPosXKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos X keyframes", default = True)
     bpy.types.Scene.genPosYKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Y keyframes", default = True)
     bpy.types.Scene.genPosZKeyframesProp = bpy.props.BoolProperty(name = "Generate Pos Z keyframes", default = True)
@@ -1117,6 +1130,10 @@ def register():
 
     bpy.types.Scene.blendToSmbStageDrawCallback3d = bpy.types.SpaceView3D.draw_handler_add(drawCallback3d, (), 'WINDOW', 'POST_VIEW')
 
+    if bpy.context.scene.autoPathsProp and bpy.path.basename(bpy.context.blend_data.filepath) != "":
+        bpy.context.scene.targetConfigProp = "//" + os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0] + ".xml"
+        bpy.context.scene.modelImportProp = "//" + os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0] + ".obj"
+
     print("BlendToSMBStage registered")
 
 def unregister():
@@ -1130,6 +1147,7 @@ def unregister():
 
     del bpy.types.Scene.targetConfigProp
     del bpy.types.Scene.modelImportProp
+    del bpy.types.Scene.autoPathsProp
 
     del bpy.types.Scene.genPosXKeyframesProp
     del bpy.types.Scene.genPosYKeyframesProp

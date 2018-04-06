@@ -622,9 +622,7 @@ class GenerateConfig(bpy.types.Operator):
             #Find all level models who are children of this item group
             children = [ob_child for ob_child in bpy.context.scene.objects if ob_child.parent == ig]
 
-            #The item group should be added as a level model if it's not an empty
-            if ig.data != None:
-                children.append(ig)
+            children.append(ig)
 
             for child in children:
                 loc = child.matrix_world.to_translation()
@@ -693,9 +691,9 @@ class GenerateConfig(bpy.types.Operator):
                     etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
                     continue
 
-                else:
+                elif child.data != None:
                     print("    levelModel: " + child.name)
-                    if child.data == None or  child.name == child.data.name:
+                    if child.name == child.data.name:
                         model = etree.SubElement(xig, "levelModel")
                         model.text = child.name.replace(" ", "_")
                     else:

@@ -4,6 +4,7 @@ from sys import platform
 import math
 import threading
 import os
+import random
 
 if platform == "linux" or platform == "linux2":
     from lxml import etree
@@ -480,6 +481,25 @@ class NewBumper(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class NewWormhole(bpy.types.Operator):
+    bl_idname = "object.new_wormhole"
+    bl_label = "New wormhole"
+    bl_description = "Creates a wormhole object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[WH] New wormhole", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["id"] = random.randint(1, 100000001);
+        ig["linkedId"] = 0
+
+        return {'FINISHED'}
+
 #Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
@@ -691,6 +711,19 @@ class GenerateConfig(bpy.types.Operator):
                     etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
                     continue
 
+                elif "[WH]" in child.name:
+                    print("    wormhole: " + child.name)
+                    goal = etree.SubElement(xig, "wormhole")
+                    name = etree.SubElement(goal, "name")
+                    name.text = "WH" + str(child["id"])
+                    name = etree.SubElement(goal, "destinationName")
+                    name.text = "WH" + str(child["linkedId"])
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
+                    continue
+
+
                 elif child.data != None:
                     print("    levelModel: " + child.name)
                     if child.name == child.data.name:
@@ -823,6 +856,7 @@ class SceneGraphPanel(bpy.types.Panel):
         row.operator(NewBananaB.bl_idname)
 
         layout.operator(NewBumper.bl_idname)
+        layout.operator(NewWormhole.bl_idname)
 
         layout.separator()
 

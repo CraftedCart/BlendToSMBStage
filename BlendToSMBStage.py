@@ -41,6 +41,7 @@ def setItemGroupProperties(ig, animated = False):
 
     ig["animId"] = 0;
     ig["initPlaying"] = 1;
+    ig["loopAnim"] = 1;
 
 def isItemGroupAnimated(ig):
     if "posXAnim" in ig and ig["posXAnim"] == 1: return True
@@ -714,24 +715,29 @@ class GenerateConfig(bpy.types.Operator):
             print(str(ig.location.y))
             print(str(ig.name))
             etree.SubElement(xig, "initialRotation", x = str(math.degrees(ig.rotation_euler.x)), y = str(math.degrees(ig.rotation_euler.z)), z = str(math.degrees(-ig.rotation_euler.y)))
-            animType = etree.SubElement(xig, "animSeesawType")
-            animType.text = "LOOPING_ANIMATION"
             animLoopTime = etree.SubElement(xig, "animLoopTime") #TODO: Allow different loop times per item group
             animLoopTime.text = str(bpy.context.scene.frame_end / 60.0)
 
             animId = 0
             initPlaying = "PLAY"
+            loop = "LOOPING_ANIMATION"
             if "animId" in ig:
                 animId = ig["animId"]
             if "initPlaying" in ig:
                 if ig["initPlaying"] == 0:
                     initPlaying = "PAUSE"
+            if "loopAnim" in ig:
+                if ig["loopAnim"] == 0:
+                    loop = "PLAY_ONCE_ANIMATION"
 
             animIdE = etree.SubElement(xig, "animGroupId")
             animIdE.text = str(animId)
 
             animInitlayE = etree.SubElement(xig, "animInitialState")
             animInitlayE.text = initPlaying
+
+            animLoopE = etree.SubElement(xig, "animSeesawType")
+            animLoopE.text = loop
 
             grid = etree.SubElement(xig, "collisionGrid")
 

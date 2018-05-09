@@ -39,6 +39,8 @@ def setItemGroupProperties(ig, animated = False):
     ig["rotYAnim"] = animated
     ig["rotZAnim"] = animated
 
+    ig["animId"] = 0;
+
 def isItemGroupAnimated(ig):
     if "posXAnim" in ig and ig["posXAnim"] == 1: return True
     if "posYAnim" in ig and ig["posYAnim"] == 1: return True
@@ -500,6 +502,96 @@ class NewWormhole(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class NewSwitchPlay(bpy.types.Operator):
+    bl_idname = "object.new_switch_play"
+    bl_label = "New switch play"
+    bl_description = "Creates a switch object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[SW_PLAY] New switch", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["animId"] = random.randint(1, 65535);
+
+        return {'FINISHED'}
+
+class NewSwitchPause(bpy.types.Operator):
+    bl_idname = "object.new_switch_pause"
+    bl_label = "New switch pause"
+    bl_description = "Creates a switch object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[SW_PAUSE] New switch", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["animId"] = random.randint(1, 65535);
+
+        return {'FINISHED'}
+
+class NewSwitchPlayBackwards(bpy.types.Operator):
+    bl_idname = "object.new_switch_play_backwards"
+    bl_label = "New switch play backwards"
+    bl_description = "Creates a switch object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[SW_PLAY_BACKWARDS] New switch", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["animId"] = random.randint(1, 65535);
+
+        return {'FINISHED'}
+
+class NewSwitchPlayFf(bpy.types.Operator):
+    bl_idname = "object.new_switch_ff"
+    bl_label = "New switch FF"
+    bl_description = "Creates a switch object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[SW_FF] New switch", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["animId"] = random.randint(1, 65535);
+
+        return {'FINISHED'}
+
+class NewSwitchPlayRw(bpy.types.Operator):
+    bl_idname = "object.new_switch_rw"
+    bl_label = "New switch RW"
+    bl_description = "Creates a switch object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        ig = bpy.data.objects.new("[SW_RW] New switch", None)
+        bpy.context.scene.objects.link(ig)
+        ig.empty_draw_type = "ARROWS"
+        bpy.ops.object.select_all(action='DESELECT')
+        ig.select = True
+        bpy.context.scene.objects.active = ig
+        ig["animId"] = random.randint(1, 65535);
+
+        return {'FINISHED'}
+
 #Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
@@ -626,6 +718,13 @@ class GenerateConfig(bpy.types.Operator):
             animLoopTime = etree.SubElement(xig, "animLoopTime") #TODO: Allow different loop times per item group
             animLoopTime.text = str(bpy.context.scene.frame_end / 60.0)
 
+            animId = 0
+            if "animId" in ig:
+                animId = ig["animId"]
+
+            animIdE = etree.SubElement(xig, "animGroupId")
+            animIdE.text = str(animId)
+
             grid = etree.SubElement(xig, "collisionGrid")
 
             collisionStartX = ig["collisionStartX"]
@@ -723,6 +822,70 @@ class GenerateConfig(bpy.types.Operator):
                     etree.SubElement(goal, "scale", x = str(child.scale.x), y = str(child.scale.z), z = str(child.scale.y))
                     continue
 
+                elif "[SW_RW]" in child.name:
+                    print("    switch: " + child.name)
+                    goal = etree.SubElement(xig, "switch")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    gType = etree.SubElement(goal, "type")
+                    gType.text = "REWIND"
+                    group = etree.SubElement(goal, "animGroupId")
+                    group.text = str(child["animId"])
+                    continue
+
+                elif "[SW_PLAY_BACKWARDS]" in child.name:
+                    print("    switch: " + child.name)
+                    goal = etree.SubElement(xig, "switch")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    gType = etree.SubElement(goal, "type")
+                    gType.text = "PLAY_BACKWARDS"
+                    group = etree.SubElement(goal, "animGroupId")
+                    group.text = str(child["animId"])
+                    continue
+
+                elif "[SW_PAUSE]" in child.name:
+                    print("    switch: " + child.name)
+                    goal = etree.SubElement(xig, "switch")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    gType = etree.SubElement(goal, "type")
+                    gType.text = "PAUSE"
+                    group = etree.SubElement(goal, "animGroupId")
+                    group.text = str(child["animId"])
+                    continue
+
+                elif "[SW_PLAY]" in child.name:
+                    print("    switch: " + child.name)
+                    goal = etree.SubElement(xig, "switch")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    gType = etree.SubElement(goal, "type")
+                    gType.text = "PLAY"
+                    group = etree.SubElement(goal, "animGroupId")
+                    group.text = str(child["animId"])
+                    continue
+
+                elif "[SW_FF]" in child.name:
+                    print("    switch: " + child.name)
+                    goal = etree.SubElement(xig, "switch")
+                    name = etree.SubElement(goal, "name")
+                    name.text = child.name
+                    etree.SubElement(goal, "position", x = str(loc.x), y = str(loc.z), z = str(-loc.y))
+                    etree.SubElement(goal, "rotation", x = str(math.degrees(rot.x)), y = str(math.degrees(rot.z)), z = str(math.degrees(-rot.y)))
+                    gType = etree.SubElement(goal, "type")
+                    gType.text = "FAST_FORWARD"
+                    group = etree.SubElement(goal, "animGroupId")
+                    group.text = str(child["animId"])
+                    continue
 
                 elif child.data != None:
                     print("    levelModel: " + child.name)
@@ -857,6 +1020,13 @@ class SceneGraphPanel(bpy.types.Panel):
 
         layout.operator(NewBumper.bl_idname)
         layout.operator(NewWormhole.bl_idname)
+
+        row = layout.row()
+        row.operator(NewSwitchPlayRw.bl_idname, icon = "REW")
+        row.operator(NewSwitchPlayBackwards.bl_idname, icon = "PLAY_REVERSE")
+        row.operator(NewSwitchPause.bl_idname, icon = "PAUSE")
+        row.operator(NewSwitchPlay.bl_idname, icon = "PLAY")
+        row.operator(NewSwitchPlayFf.bl_idname, icon = "FF")
 
         layout.separator()
 

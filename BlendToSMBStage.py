@@ -40,6 +40,7 @@ def setItemGroupProperties(ig, animated = False):
     ig["rotZAnim"] = animated
 
     ig["animId"] = 0;
+    ig["initPlaying"] = 1;
 
 def isItemGroupAnimated(ig):
     if "posXAnim" in ig and ig["posXAnim"] == 1: return True
@@ -719,11 +720,18 @@ class GenerateConfig(bpy.types.Operator):
             animLoopTime.text = str(bpy.context.scene.frame_end / 60.0)
 
             animId = 0
+            initPlaying = "PLAY"
             if "animId" in ig:
                 animId = ig["animId"]
+            if "initPlaying" in ig:
+                if ig["initPlaying"] == 0:
+                    initPlaying = "PAUSE"
 
             animIdE = etree.SubElement(xig, "animGroupId")
             animIdE.text = str(animId)
+
+            animInitlayE = etree.SubElement(xig, "animInitialState")
+            animInitlayE.text = initPlaying
 
             grid = etree.SubElement(xig, "collisionGrid")
 

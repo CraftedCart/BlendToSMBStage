@@ -595,6 +595,20 @@ class NewSwitchPlayRw(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class MakeNocoli(bpy.types.Operator):
+    bl_idname = "object.make_nocoli"
+    bl_label = "Disable collision for selected"
+    bl_description = "Will not generate collision for NOCOLI objects"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        for obj in bpy.context.selected_objects:
+            obj.name = "[NOCOLI] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
     bl_label = "Copy animation XML for active object to clipboard"
@@ -902,13 +916,21 @@ class GenerateConfig(bpy.types.Operator):
                     continue
 
                 elif child.data != None:
-                    print("    levelModel: " + child.name)
+                    print("    stageModel: " + child.name)
                     if child.name == child.data.name:
-                        model = etree.SubElement(xig, "levelModel")
-                        model.text = child.name.replace(" ", "_")
+                        name = child.name.replace(" ", "_")
                     else:
-                        model = etree.SubElement(xig, "levelModel")
-                        model.text = (child.name + "_" + child.data.name).replace(" ", "_")
+                        name = (child.name + "_" + child.data.name).replace(" ", "_")
+
+                    model = etree.SubElement(xig, "stageModel")
+                    mn = etree.SubElement(model, "name")
+                    mn.text = name
+
+                    if not "[NOCOLI]" in child.name:
+                        mc = etree.SubElement(model, "collision")
+                        mm = etree.SubElement(mc, "meshCollision")
+                        mmn = etree.SubElement(mm, "name")
+                        mmn.text = name
 
             #Set this as the active (Required for the addPos/Rot anim, because I'm a lazy sod who can't be bothered to tweak it)
             bpy.context.scene.objects.active = ig
@@ -1041,6 +1063,10 @@ class SceneGraphPanel(bpy.types.Panel):
         row.operator(NewSwitchPause.bl_idname, icon = "PAUSE")
         row.operator(NewSwitchPlay.bl_idname, icon = "PLAY")
         row.operator(NewSwitchPlayFf.bl_idname, icon = "FF")
+
+        layout.separator()
+
+        layout.operator(MakeNocoli.bl_idname)
 
         layout.separator()
 

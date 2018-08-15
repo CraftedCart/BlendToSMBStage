@@ -5,6 +5,7 @@ import math
 import threading
 import os
 import random
+import webbrowser
 
 if platform == "linux" or platform == "linux2":
     from lxml import etree
@@ -993,6 +994,13 @@ class GenerateConfig(bpy.types.Operator):
         f.write(config)
         f.close()
 
+        self.report({"ERROR"}, "Note that you WILL need a development version of ws2 for now - beta 1 won't work\n" +
+                    "Download at https://bintray.com/craftedcart/the-workshop/smblevelworkshop2-develop/_latestVersion - under the \"Files\" tab\n" +
+                    "(There's a button to go there under \"Export OBJ\")\n" +
+                    "\n" +
+                    "btw this isn't an error"
+                    )
+
         return {'FINISHED'}
 
 #Operation
@@ -1008,6 +1016,19 @@ class ExportOBJ(bpy.types.Operator):
             filepath = bpy.path.abspath(context.scene.modelImportProp),
             use_triangles = True
         )
+
+        return {'FINISHED'}
+
+#Operation
+class Ws2Link(bpy.types.Operator):
+    bl_idname = "object.ws2_link"
+    bl_label = "Download Workshop 2 dev builds"
+    bl_description = "Beta builds won't work for now"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        webbrowser.open("https://bintray.com/craftedcart/the-workshop/smblevelworkshop2-develop/_latestVersion", new=0, autoraise=True)
 
         return {'FINISHED'}
 
@@ -1131,6 +1152,10 @@ class ExportScenePanel(bpy.types.Panel):
 
         layout.operator(GenerateConfig.bl_idname)
         layout.operator(ExportOBJ.bl_idname)
+
+        layout.separator()
+
+        layout.operator(Ws2Link.bl_idname)
 
 #Tool shelf panel
 class ExportAnimPanel(bpy.types.Panel):

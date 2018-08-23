@@ -610,6 +610,20 @@ class MakeNocoli(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class MakeNodisp(bpy.types.Operator):
+    bl_idname = "object.make_nodisp"
+    bl_label = "Disable visibility for selected"
+    bl_description = "Will not mark NODISP objects as visible"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        for obj in bpy.context.selected_objects:
+            obj.name = "[NODISP] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
     bl_label = "Copy animation XML for active object to clipboard"
@@ -923,9 +937,14 @@ class GenerateConfig(bpy.types.Operator):
                     else:
                         name = (child.name + "_" + child.data.name).replace(" ", "_")
 
+                    if "[NODISP]" in name:
+                        dispName = "__" + name
+                    else:
+                        dispName = name
+
                     model = etree.SubElement(xig, "stageModel")
                     mn = etree.SubElement(model, "name")
-                    mn.text = name
+                    mn.text = dispName
 
                     if not "[NOCOLI]" in child.name:
                         mc = etree.SubElement(model, "collision")
@@ -1088,6 +1107,7 @@ class SceneGraphPanel(bpy.types.Panel):
         layout.separator()
 
         layout.operator(MakeNocoli.bl_idname)
+        layout.operator(MakeNodisp.bl_idname)
 
         layout.separator()
 

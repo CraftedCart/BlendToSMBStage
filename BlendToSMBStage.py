@@ -1290,12 +1290,12 @@ def drawCallback3d():
         drawGrid(-512, -512, 4, 4, 256, 256, bpy.context.scene.falloutProp)
 
     #Collision grids
-    itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.contains("[IG]")]
+    itemGroups = [obj for obj in bpy.context.scene.objects if "[IG]" in obj.name]
 
     if bpy.context.scene.drawCollisionGridProp:
         for ig in itemGroups:
             if ig in bpy.context.selected_objects:
-                if ig != None and ig.name.contains("[IG]"):
+                if ig != None and "[IG]" in ig.name:
                     bgl.glColor4f(0.30, 0.69, 0.31, 0.5)
                     collisionStartX = ig["collisionStartX"]
                     collisionStartY = ig["collisionStartY"]

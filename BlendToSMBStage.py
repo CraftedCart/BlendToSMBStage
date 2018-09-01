@@ -1067,7 +1067,7 @@ class SceneGraphPanel(bpy.types.Panel):
 
         layout = self.layout
 
-        layout.label("Item groups are objects whose name begins with [IG]")
+        layout.label("Item groups are objects whose name has [IG]")
         layout.label("Do not change the [IG] name prefix!")
         layout.label("Parent objects to the item group to add them")
         layout.label("Existing animated objects can just have the [IG] prefix applied to their name")
@@ -1290,12 +1290,12 @@ def drawCallback3d():
         drawGrid(-512, -512, 4, 4, 256, 256, bpy.context.scene.falloutProp)
 
     #Collision grids
-    itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
+    itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.contains("[IG]")]
 
     if bpy.context.scene.drawCollisionGridProp:
         for ig in itemGroups:
             if ig in bpy.context.selected_objects:
-                if ig != None and ig.name.startswith("[IG]"):
+                if ig != None and ig.name.contains("[IG]"):
                     bgl.glColor4f(0.30, 0.69, 0.31, 0.5)
                     collisionStartX = ig["collisionStartX"]
                     collisionStartY = ig["collisionStartY"]

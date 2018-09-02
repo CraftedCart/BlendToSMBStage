@@ -60,27 +60,9 @@ def addPosXAnim(parent):
 
     bpy.context.scene.frame_set(0)
 
-    hitLast = False
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if i == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round(bpy.context.scene.objects.active.location.x, bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(bpy.context.scene.objects.active.location.x, bpy.context.scene.roundValueProp)
 
@@ -97,14 +79,9 @@ def addPosYAnim(parent):
 
     hitLast = False
 
-    bpy.context.scene.frame_set(0)
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if i == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(-bpy.context.scene.objects.active.location.y, bpy.context.scene.roundValueProp)
 
@@ -114,20 +91,6 @@ def addPosYAnim(parent):
         keyframe.set("easing", "LINEAR")
 
         parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round(-bpy.context.scene.objects.active.location.y, bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
 
 def addPosZAnim(parent):
     startFrame = bpy.context.scene.frame_start
@@ -135,27 +98,9 @@ def addPosZAnim(parent):
 
     bpy.context.scene.frame_set(0)
 
-    hitLast = False;
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if i == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round(bpy.context.scene.objects.active.location.z, bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(bpy.context.scene.objects.active.location.z, bpy.context.scene.roundValueProp)
 
@@ -172,27 +117,9 @@ def addRotXAnim(parent):
 
     bpy.context.scene.frame_set(0)
 
-    hitLast = False
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if 1 == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round(math.degrees(bpy.context.scene.objects.active.rotation_euler.x), bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(math.degrees(bpy.context.scene.objects.active.rotation_euler.x), bpy.context.scene.roundValueProp)
 
@@ -209,27 +136,9 @@ def addRotYAnim(parent):
 
     bpy.context.scene.frame_set(0)
 
-    hitLast = False
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if 1 == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round(math.degrees(-bpy.context.scene.objects.active.rotation_euler.y), bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round(math.degrees(-bpy.context.scene.objects.active.rotation_euler.y), bpy.context.scene.roundValueProp)
 
@@ -246,27 +155,9 @@ def addRotZAnim(parent):
 
     bpy.context.scene.frame_set(0)
 
-    hitLast = False
-
-    for i in range(startFrame, endFrame, bpy.context.scene.timeStepProp):
-        if 1 == endFrame:
-            hitLast = True
-
+    for i in range(startFrame, endFrame + 2 * bpy.context.scene.timeStepProp, bpy.context.scene.timeStepProp):
         bpy.context.scene.frame_set(i)
-        seconds = round(i / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
-
-        val = round((bpy.context.scene.objects.active.rotation_euler.z) / (2 * math.pi) * 360.0, bpy.context.scene.roundValueProp)
-
-        keyframe = etree.Element("keyframe")
-        keyframe.set("time", str(seconds))
-        keyframe.set("value", str(val))
-        keyframe.set("easing", "LINEAR")
-
-        parent.append(keyframe);
-
-    if not hitLast:
-        bpy.context.scene.frame_set(endFrame)
-        seconds = round(endFrame / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
+        seconds = round((i - startFrame) / bpy.context.scene.render.fps, bpy.context.scene.roundTimeProp)
 
         val = round((bpy.context.scene.objects.active.rotation_euler.z) / (2 * math.pi) * 360.0, bpy.context.scene.roundValueProp)
 
@@ -745,7 +636,7 @@ class GenerateConfig(bpy.types.Operator):
             print(str(ig.name))
             etree.SubElement(xig, "initialRotation", x = str(math.degrees(ig.rotation_euler.x)), y = str(math.degrees(ig.rotation_euler.z)), z = str(math.degrees(-ig.rotation_euler.y)))
             animLoopTime = etree.SubElement(xig, "animLoopTime") #TODO: Allow different loop times per item group
-            animLoopTime.text = str(bpy.context.scene.frame_end / 60.0)
+            animLoopTime.text = str((bpy.context.scene.frame_end - bpy.context.scene.frame_start + 1) / 60.0)
 
             animId = 0
             initPlaying = "PLAY"

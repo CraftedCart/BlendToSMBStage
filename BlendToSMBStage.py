@@ -611,7 +611,7 @@ class GenerateConfig(bpy.types.Operator):
                 model.text = (ig.name + "_" + ig.data.name).replace(" ", "_")
 
         #Find and export item groups
-        itemGroups = [obj for obj in bpy.context.scene.objects if obj.name.startswith("[IG]")]
+        itemGroups = [obj for obj in bpy.context.scene.objects if "[IG]" in obj.name]
 
         dummyIg = etree.SubElement(root, "itemGroup") #TODO: This is kind-of a hack to work around stuff being funky with the first item group
         grid = etree.SubElement(dummyIg, "collisionGrid")

@@ -515,6 +515,20 @@ class MakeNodisp(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class MakeMir(bpy.types.Operator):
+    bl_idname = "object.make_mir"
+    bl_label = "Make selected runtime reflective"
+    bl_description = "[MIR]"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        for obj in bpy.context.selected_objects:
+            obj.name = "[MIR] " + obj.name
+
+        return {'FINISHED'}
+
+#Operation
 class CopyAnimXML(bpy.types.Operator):
     bl_idname = "object.copy_anim_xml"
     bl_label = "Copy animation XML for active object to clipboard"
@@ -843,6 +857,10 @@ class GenerateConfig(bpy.types.Operator):
                         mmn = etree.SubElement(mm, "name")
                         mmn.text = name
 
+                    if "[MIR]" in child.name:
+                        mm = etree.SubElement(model, "runtimeReflective")
+                        mm.text = "true"
+
             #Set this as the active (Required for the addPos/Rot anim, because I'm a lazy sod who can't be bothered to tweak it)
             bpy.context.scene.objects.active = ig
 
@@ -999,6 +1017,7 @@ class SceneGraphPanel(bpy.types.Panel):
 
         layout.operator(MakeNocoli.bl_idname)
         layout.operator(MakeNodisp.bl_idname)
+        layout.operator(MakeMir.bl_idname)
 
         layout.separator()
 

@@ -6,6 +6,7 @@ import threading
 import os
 import random
 import webbrowser
+import re
 
 if platform == "linux" or platform == "linux2":
     from lxml import etree
@@ -574,6 +575,76 @@ class CopyAnimXML(bpy.types.Operator):
         return {'FINISHED'}
 
 #Operation
+class AddExternalObjects(bpy.types.Operator):
+    bl_idname = "object.add_external_objects"
+    bl_label = "Add external objects"
+    # bl_description = ""
+    bl_options = {'REGISTER', 'UNDO'}
+
+    #Execute function
+    def execute(self, context):
+        #Create the text block
+        textblock  = bpy.data.texts.get("blendtosmbstage:addexternalobjects")
+        if textblock is None:
+            textblock  = bpy.data.texts.new("blendtosmbstage:addexternalobjects")
+
+        textblock.from_string("""# Write your external objects from line 9 onwards, one per line
+# Then hit "Run script" at the bottom to add them
+# Don't forget to parent them to item groups or mark them as background objects!
+
+import bpy
+
+
+external_objects = \"\"\"
+
+\"\"\"
+
+bpy.ops.object.confirm_add_external_objects("INVOKE_DEFAULT", objects=external_objects)
+""")
+
+        #Open the user prefs window
+        bpy.ops.screen.userpref_show("INVOKE_DEFAULT")
+
+        #Change area type to a text editor
+        area = bpy.context.window_manager.windows[-1].screen.areas[0]
+        area.type = "TEXT_EDITOR"
+        area.spaces[0].text = textblock
+        area.spaces[0].show_line_highlight = True
+        area.spaces[0].show_line_numbers = True
+        area.spaces[0].show_syntax_highlight = True
+        bpy.ops.text.jump(line=1) #Scroll to the top
+
+        return {'FINISHED'}
+
+#Operation
+class ConfirmAddExternalObjects(bpy.types.Operator):
+    bl_idname = "object.confirm_add_external_objects"
+    bl_label = "Confirm add external objects"
+    # bl_description = ""
+    bl_options = {'REGISTER', 'UNDO'}
+
+    objects = bpy.props.StringProperty()
+
+    #Execute function
+    def execute(self, context):
+        obj_list = self.objects.split("\n")
+
+        bpy.ops.object.select_all(action='DESELECT')
+
+        for obj in obj_list:
+            if obj == "":
+                continue
+
+            ig = bpy.data.objects.new("[EXT:{}]".format(obj), None)
+            bpy.context.scene.objects.link(ig)
+            ig.empty_draw_type = "ARROWS"
+            setItemGroupProperties(ig)
+            ig.select = True
+            bpy.context.scene.objects.active = ig
+
+        return {'FINISHED'}
+
+#Operation
 class GenerateConfig(bpy.types.Operator):
     bl_idname = "object.generate_config"
     bl_label = "Generate config"
@@ -618,8 +689,12 @@ class GenerateConfig(bpy.types.Operator):
             xig = etree.SubElement(root, "backgroundModel")
 
             if ig.data == None or ig.name == ig.data.name:
-                model = etree.SubElement(xig, "name")
-                model.text = ig.name.replace(" ", "_")
+                if "[EXT:" in ig.name:
+                    model = etree.SubElement(xig, "name")
+                    model.text = re.search(r".*\[EXT:(.*)\].*", ig.name).group(1)
+                else:
+                    model = etree.SubElement(xig, "name")
+                    model.text = ig.name.replace(" ", "_")
             else:
                 model = etree.SubElement(xig, "name")
                 model.text = (ig.name + "_" + ig.data.name).replace(" ", "_")
@@ -835,6 +910,13 @@ class GenerateConfig(bpy.types.Operator):
                     group.text = str(child["animId"])
                     continue
 
+                elif "[EXT:" in child.name:
+                    name = re.search(r".*\[EXT:(.*)\].*", child.name).group(1)
+                    print("    stageModel: " + child.name)
+                    model = etree.SubElement(xig, "stageModel")
+                    mn = etree.SubElement(model, "name")
+                    mn.text = name
+
                 elif child.data != None:
                     print("    stageModel: " + child.name)
                     if child.name == child.data.name:
@@ -1012,6 +1094,10 @@ class SceneGraphPanel(bpy.types.Panel):
         row.operator(NewSwitchPause.bl_idname, icon = "PAUSE")
         row.operator(NewSwitchPlay.bl_idname, icon = "PLAY")
         row.operator(NewSwitchPlayFf.bl_idname, icon = "FF")
+
+        layout.separator()
+
+        layout.operator(AddExternalObjects.bl_idname)
 
         layout.separator()
 

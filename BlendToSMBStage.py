@@ -922,12 +922,12 @@ class GenerateConfig(bpy.types.Operator):
         f.write(config)
         f.close()
 
-        self.report({"ERROR"}, "Note that you WILL need a development version of ws2 for now - beta 1 won't work\n" +
-                    "Download at https://bintray.com/craftedcart/the-workshop/smblevelworkshop2-develop/_latestVersion - under the \"Files\" tab\n" +
-                    "(There's a button to go there under \"Export OBJ\")\n" +
-                    "\n" +
-                    "btw this isn't an error"
-                    )
+        # self.report({"ERROR"}, "Note that you WILL need a development version of ws2 for now - beta 1 won't work\n" +
+        #             "Download at https://bintray.com/craftedcart/the-workshop/smblevelworkshop2-develop/_latestVersion - under the \"Files\" tab\n" +
+        #             "(There's a button to go there under \"Export OBJ\")\n" +
+        #             "\n" +
+        #             "btw this isn't an error"
+        #             )
 
         return {'FINISHED'}
 
@@ -1086,6 +1086,8 @@ class ExportScenePanel(bpy.types.Panel):
         layout.separator()
 
         layout.operator(Ws2Link.bl_idname)
+        layout.label("Dev builds of ws2 are required", icon="ERROR")
+        layout.label("v1.0.0-bata.1 won't work!")
 
 #Tool shelf panel
 class ExportAnimPanel(bpy.types.Panel):
